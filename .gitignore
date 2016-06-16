@@ -1,0 +1,8 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea/
+d3-scatterplot.iml
+node_modules
+
+bower_components
+
+tmp
