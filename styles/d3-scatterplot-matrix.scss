@@ -1,18 +1,52 @@
-svg.mw-d3-scatterplot{
+svg.mw-d3-scatterplot-matrix{
   background-color: white;
   font-size: 11px;
   height: 100%;
   .mw-axis{
+    shape-rendering: crispEdges;
+    path {
+      display: none;
+    }
 
-    path, line{
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
+    line {
+      stroke: #ddd;
+    }
+    &.mw-no-guides{
+      line{
+        display: none;
+      }
     }
   }
 
   .mw-dot {
     //stroke: #000;
+  }
+
+  .mw-frame {
+    shape-rendering: crispEdges;
+    fill: none;
+    stroke: #aaa;
+  }
+
+  .mw-cell{
+    text {
+      font-weight: bold;
+      text-transform: capitalize;
+    }
+  }
+
+  circle {
+    fill-opacity: .7;
+    &.hidden {
+      fill: #ccc !important;
+    }
+
+  }
+
+  .extent {
+    fill: #000;
+    fill-opacity: .125;
+    stroke: #fff;
   }
 
 }
