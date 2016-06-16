@@ -28,7 +28,7 @@ gulp.task('build-css', function () {
 });
 
 gulp.task('build-js', function () {
-    var jsFileName = 'd3-scatterplot';
+    var jsFileName = 'd3-scatterplot-matrix';
    var pretty = gulp.src('./src/*.js')
         .pipe(plugins.plumber({ errorHandler: onError }))
         .pipe(plugins.concat(jsFileName+'.js'))
