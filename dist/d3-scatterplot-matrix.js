@@ -38,24 +38,30 @@ D3ScatterPlotMatrixUtils.prototype.cross = function (a, b) {
     return c;
 };
 
-D3ScatterPlotMatrixUtils.prototype.inferTraits = function (data, categoryKey) {
+D3ScatterPlotMatrixUtils.prototype.inferTraits = function (data, categoryKey, includeCategory) {
+    var res = [];
     if (data.length) {
         var d = data[0];
         if (d instanceof Array) {
-            return d.map(function (v, i) {
+            res=  d.map(function (v, i) {
                 return i;
-            })
+            });
         }else if (typeof d === 'object'){
-            var res = [];
+
             for (var prop in d) {
-                if(!d.hasOwnProperty(prop) || prop == categoryKey) continue;
+                if(!d.hasOwnProperty(prop)) continue;
 
                 res.push(prop);
             }
-            return res;
         }
     }
-    return [];
+    if(!includeCategory){
+        var index = res.indexOf(categoryKey);
+        if (index > -1) {
+            res.splice(index, 1);
+        }
+    }
+    return res
 };
 function D3ScatterPlotMatrix(placeholderSelector, data, config) {
     this.utils = new D3ScatterPlotMatrixUtils();
@@ -67,6 +73,7 @@ function D3ScatterPlotMatrix(placeholderSelector, data, config) {
         padding: 20,
         brush: true,
         guides: true,
+        ticks: 6,
         margin: {
             left: 30,
             right: 30,
@@ -88,6 +95,7 @@ function D3ScatterPlotMatrix(placeholderSelector, data, config) {
             labels: [], //optional array of trait labels
             keys: [], //optional array of trait keys
             categoryKey: null,
+            includeCategoryInPlot: false,
             value: function (d, traitKey) {// trait value accessor
                 return d[traitKey];
             }
@@ -187,7 +195,7 @@ D3ScatterPlotMatrix.prototype.setupTraits = function () {
     plot.domainByTrait = {};
     plot.traits = traitsConf.keys;
     if(!plot.traits || !plot.traits.length){
-        plot.traits = this.utils.inferTraits(data, traitsConf.categoryKey);
+        plot.traits = this.utils.inferTraits(data, traitsConf.categoryKey, traitsConf.includeCategoryInPlot);
     }
 
     plot.labels = [];
@@ -218,7 +226,7 @@ D3ScatterPlotMatrix.prototype.setupX = function () {
     x.map = function (d, trait) {
         return x.scale(x.value(d, trait));
     };
-    x.axis = d3.svg.axis().scale(x.scale).orient(conf.x.orient).ticks(6);
+    x.axis = d3.svg.axis().scale(x.scale).orient(conf.x.orient).ticks(conf.ticks);
     x.axis.tickSize(plot.size * plot.traits.length);
 
 };
@@ -234,7 +242,7 @@ D3ScatterPlotMatrix.prototype.setupY = function () {
     y.map = function (d, trait) {
         return y.scale(y.value(d, trait));
     };
-    y.axis= d3.svg.axis().scale(y.scale).orient(conf.y.orient).ticks(6);
+    y.axis= d3.svg.axis().scale(y.scale).orient(conf.y.orient).ticks(conf.ticks);
     y.axis.tickSize(-plot.size * plot.traits.length);
 };
 

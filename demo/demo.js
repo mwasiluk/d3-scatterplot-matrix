@@ -2,12 +2,13 @@
 var labels = ['a', 'b', 'c', 'd'];
 var conf = {
     size: 200,
-    guides: false,
+    guides: true,
     brush: true,
     traits: {
-        categoryKey: 'species'
+        categoryKey: 'species',
+        // includeCategoryInPlot: true,
         // keys: ['petal length', 'petal width'],
-        // labels: ['a', 'b', 'c', 'd']
+        labels: ['a', 'b', 'c', 'd', 'e']
     }
 
 
@@ -27,7 +28,11 @@ var data = [
 //     [1, 7, 3]
 // ];
 
+
+
 var plot;
+/*plot = new D3ScatterPlotMatrix("#scatterplot", data, conf);
+plot.init();*/
 d3.csv("flowers.csv", function(error, data) {
     console.log(data);
     plot = new D3ScatterPlotMatrix("#scatterplot", data, conf);

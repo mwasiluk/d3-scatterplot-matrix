@@ -38,22 +38,28 @@ D3ScatterPlotMatrixUtils.prototype.cross = function (a, b) {
     return c;
 };
 
-D3ScatterPlotMatrixUtils.prototype.inferTraits = function (data, categoryKey) {
+D3ScatterPlotMatrixUtils.prototype.inferTraits = function (data, categoryKey, includeCategory) {
+    var res = [];
     if (data.length) {
         var d = data[0];
         if (d instanceof Array) {
-            return d.map(function (v, i) {
+            res=  d.map(function (v, i) {
                 return i;
-            })
+            });
         }else if (typeof d === 'object'){
-            var res = [];
+
             for (var prop in d) {
-                if(!d.hasOwnProperty(prop) || prop == categoryKey) continue;
+                if(!d.hasOwnProperty(prop)) continue;
 
                 res.push(prop);
             }
-            return res;
         }
     }
-    return [];
+    if(!includeCategory){
+        var index = res.indexOf(categoryKey);
+        if (index > -1) {
+            res.splice(index, 1);
+        }
+    }
+    return res
 };
