@@ -8,23 +8,28 @@ D3ScatterPlotMatrixUtils.prototype.deepExtend = function (out) { //TODO consider
     var emptyOut = {};
 
 
-    if (!out && arguments.length > 1 && arguments[1] instanceof Array) {
+    if (!out && arguments.length > 1 && Array.isArray(arguments[1])) {
         out = [];
     }
     out = out || {};
 
     for (var i = 1; i < arguments.length; i++) {
-        var obj = arguments[i];
-
-        if (!obj)
+        var source = arguments[i];
+        if (!source)
             continue;
 
-        for (var key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                if (typeof obj[key] === 'object')
-                    out[key] = utils.deepExtend(out[key], obj[key]);
-                else
-                    out[key] = obj[key];
+        for (var key in source) {
+            if (!source.hasOwnProperty(key)) {
+                continue;
+            }
+            var isArray = Array.isArray(out[key]);
+            var isObject = utils.isObject(out[key]);
+            var srcObj = utils.isObject(source[key]);
+
+            if (isObject && !isArray && srcObj) {
+                utils.deepExtend(out[key], source[key]);
+            } else {
+                out[key] = source[key];
             }
         }
     }
@@ -63,6 +68,17 @@ D3ScatterPlotMatrixUtils.prototype.inferTraits = function (data, categoryKey, in
     }
     return res
 };
+
+
+D3ScatterPlotMatrixUtils.prototype.isObject = function(a) {
+    return a !== null && typeof a === 'object';
+};
+D3ScatterPlotMatrixUtils.prototype.isNumber = function(a) {
+    return !isNaN(a) && typeof a === 'number';
+};
+D3ScatterPlotMatrixUtils.prototype.isFunction = function(a) {
+    return typeof a === 'function';
+};
 function D3ScatterPlotMatrix(placeholderSelector, data, config) {
     this.utils = new D3ScatterPlotMatrixUtils();
     this.placeholderSelector = placeholderSelector;
@@ -73,7 +89,7 @@ function D3ScatterPlotMatrix(placeholderSelector, data, config) {
         padding: 20,
         brush: true,
         guides: true,
-        ticks: 6,
+        ticks: null,
         margin: {
             left: 30,
             right: 30,
@@ -88,7 +104,7 @@ function D3ScatterPlotMatrix(placeholderSelector, data, config) {
         },
         dot: {
             radius: 2,
-            color: false, // string or function returning color's value for color scale
+            color: null, // string or function returning color's value for color scale
             d3ColorCategory: 'category10'
         },
         traits: {
@@ -162,6 +178,9 @@ D3ScatterPlotMatrix.prototype.initPlot = function () {
 
 
 
+    if(conf.ticks===null){
+        conf.ticks = this.plot.size / 40;
+    }
 
     this.setupX();
     this.setupY();

@@ -8,7 +8,7 @@ function D3ScatterPlotMatrix(placeholderSelector, data, config) {
         padding: 20,
         brush: true,
         guides: true,
-        ticks: 6,
+        ticks: null,
         margin: {
             left: 30,
             right: 30,
@@ -23,7 +23,7 @@ function D3ScatterPlotMatrix(placeholderSelector, data, config) {
         },
         dot: {
             radius: 2,
-            color: false, // string or function returning color's value for color scale
+            color: null, // string or function returning color's value for color scale
             d3ColorCategory: 'category10'
         },
         traits: {
@@ -97,6 +97,9 @@ D3ScatterPlotMatrix.prototype.initPlot = function () {
 
 
 
+    if(conf.ticks===null){
+        conf.ticks = this.plot.size / 40;
+    }
 
     this.setupX();
     this.setupY();
