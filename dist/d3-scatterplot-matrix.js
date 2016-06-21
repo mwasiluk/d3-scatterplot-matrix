@@ -110,6 +110,7 @@ function D3ScatterPlotMatrix(placeholderSelector, data, config) {
         this.setData(data);
     }
 
+    this.init();
 }
 
 D3ScatterPlotMatrix.prototype.setData = function (data) {
@@ -137,12 +138,18 @@ D3ScatterPlotMatrix.prototype.initPlot = function () {
         }
     };
 
+    this.setupTraits();
+
+    this.plot.size = conf.size;
+
 
     var width = conf.width;
     var placeholderNode = d3.select(this.placeholderSelector).node();
 
     if (!width) {
-        width = placeholderNode.getBoundingClientRect().width;
+        var maxWidth = margin.left + margin.right + this.plot.traits.length*this.plot.size;
+        width = Math.min(placeholderNode.getBoundingClientRect().width, maxWidth);
+
     }
     var height = width;
     if (!height) {
@@ -151,10 +158,10 @@ D3ScatterPlotMatrix.prototype.initPlot = function () {
 
     this.plot.width = width - margin.left - margin.right;
     this.plot.height = height - margin.top - margin.bottom;
-    this.plot.size = conf.size;
 
 
-    this.setupTraits();
+
+
 
     this.setupX();
     this.setupY();
@@ -213,6 +220,7 @@ D3ScatterPlotMatrix.prototype.setupTraits = function () {
 
     console.log(plot.labelByTrait);
 
+    plot.subplots = [];
 };
 
 D3ScatterPlotMatrix.prototype.setupX = function () {
@@ -287,10 +295,10 @@ D3ScatterPlotMatrix.prototype.drawPlot = function () {
 
 
     function plotSubplot(p) {
-
+        var plot = self.plot;
+        plot.subplots.push(p);
         var cell = d3.select(this);
 
-        var plot = self.plot;
         plot.x.scale.domain(plot.domainByTrait[p.x]);
         plot.y.scale.domain(plot.domainByTrait[p.y]);
 
@@ -301,16 +309,31 @@ D3ScatterPlotMatrix.prototype.drawPlot = function () {
             .attr("width", conf.size - conf.padding)
             .attr("height", conf.size - conf.padding);
 
-        var dots = cell.selectAll("circle")
-            .data(self.data)
-            .enter().append("circle")
-            .attr("cx", function(d){return plot.x.map(d, p.x)})
-            .attr("cy", function(d){return plot.y.map(d, p.y)})
-            .attr("r", self.config.dot.radius);
-        if (plot.dot.color) {
-            dots.style("fill", plot.dot.color)
-        }
+
+        p.update = function(){
+            var subplot = this;
+            var dots = cell.selectAll("circle")
+                .data(self.data);
+
+            dots.enter().append("circle");
+
+            dots.attr("cx", function(d){return plot.x.map(d, subplot.x)})
+                .attr("cy", function(d){return plot.y.map(d, subplot.y)})
+                .attr("r", self.config.dot.radius);
+
+            if (plot.dot.color) {
+                dots.style("fill", plot.dot.color)
+            }
+
+            dots.exit().remove();
+        };
+
+        p.update();
     }
+};
+
+D3ScatterPlotMatrix.prototype.update = function () {
+    this.plot.subplots.forEach(function(p){p.update()});
 };
 
 
