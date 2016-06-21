@@ -4,6 +4,7 @@ var conf = {
     size: 200,
     guides: true,
     brush: true,
+    tooltip: true,
     traits: {
         categoryKey: 'species',
         // includeCategoryInPlot: true,

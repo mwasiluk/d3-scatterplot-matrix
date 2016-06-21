@@ -25,3 +25,12 @@ svg.mw-d3-scatterplot-matrix {
     fill: #000;
     fill-opacity: .125;
     stroke: #fff; }
+
+.mw-tooltip {
+  position: absolute;
+  pointer-events: none;
+  font-size: 11px;
+  background: #fdfdfd;
+  padding: 3px 5px;
+  border-radius: 8px;
+  box-shadow: 1px 3px 3px #b7b7b7; }

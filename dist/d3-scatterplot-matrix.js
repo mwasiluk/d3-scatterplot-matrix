@@ -89,6 +89,7 @@ function D3ScatterPlotMatrix(placeholderSelector, data, config) {
         padding: 20,
         brush: true,
         guides: true,
+        tooltip: true,
         ticks: null,
         margin: {
             left: 30,
@@ -292,12 +293,25 @@ D3ScatterPlotMatrix.prototype.drawPlot = function () {
         .attr("transform", function(d, i) { return "translate(0," + i * self.plot.size + ")"; })
         .each(function(d) { self.plot.y.scale.domain(self.plot.domainByTrait[d]); d3.select(this).call(self.plot.y.axis); });
 
+
+    if(conf.tooltip){
+        self.plot.tooltip = d3.select(self.placeholderSelector).append("div")
+            .attr("class", "mw-tooltip")
+            .style("opacity", 0);
+    }
+
     var cell = self.svgG.selectAll(".mw-cell")
         .data(self.utils.cross(self.plot.traits, self.plot.traits))
         .enter().append("g")
         .attr("class", "mw-cell")
-        .attr("transform", function(d) { return "translate(" + (n - d.i - 1) * self.plot.size + "," + d.j * self.plot.size + ")"; })
-        .each(plotSubplot);
+        .attr("transform", function(d) { return "translate(" + (n - d.i - 1) * self.plot.size + "," + d.j * self.plot.size + ")"; });
+
+    if(conf.brush){
+        this.drawBrush(cell);
+    }
+
+    cell.each(plotSubplot);
+
 
 
     //Labels
@@ -307,9 +321,6 @@ D3ScatterPlotMatrix.prototype.drawPlot = function () {
         .attr("dy", ".71em")
         .text(function(d) { return self.plot.labelByTrait[d.x]; });
 
-    if(conf.brush){
-       this.drawBrush(cell);
-    }
 
 
 
@@ -344,11 +355,30 @@ D3ScatterPlotMatrix.prototype.drawPlot = function () {
                 dots.style("fill", plot.dot.color)
             }
 
+            if(plot.tooltip){
+                dots.on("mouseover", function(d) {
+                    plot.tooltip.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    plot.tooltip.html("(" + plot.x.value(d, subplot.x)
+                        + ", " +plot.y.value(d, subplot.y) + ")")
+                        .style("left", (d3.event.pageX + 5) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+                })
+                    .on("mouseout", function(d) {
+                        plot.tooltip.transition()
+                            .duration(500)
+                            .style("opacity", 0);
+                    });
+            }
+
             dots.exit().remove();
         };
 
         p.update();
     }
+
+
 };
 
 D3ScatterPlotMatrix.prototype.update = function () {
@@ -403,7 +433,7 @@ D3ScatterPlotMatrix.prototype.drawBrush = function (cell) {
         .on("brush", brushmove)
         .on("brushend", brushend);
 
-    cell.call(brush);
+    cell.append("g").call(brush);
 
 
     var brushCell;
