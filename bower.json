@@ -1,0 +1,21 @@
+{
+  "name": "d3-scatterplot-matrix-page",
+  "homepage": "https://github.com/mwasiluk/d3-scatterplot-matrix",
+  "authors": [
+    "Michal Wasiluk"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3-scatterplot-matrix": "^0.1.0"
+  }
+}
