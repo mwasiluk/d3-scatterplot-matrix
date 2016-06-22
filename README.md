@@ -1,6 +1,6 @@
 # d3-scatterplot-matrix
 
-
+[Online Demo](https://mwasiluk.github.io/d3-scatterplot-matrix)
 
 ## Bower
 
