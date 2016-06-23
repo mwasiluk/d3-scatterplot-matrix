@@ -79,14 +79,22 @@ D3ScatterPlotMatrixUtils.prototype.isNumber = function(a) {
 D3ScatterPlotMatrixUtils.prototype.isFunction = function(a) {
     return typeof a === 'function';
 };
+
+D3ScatterPlotMatrixUtils.prototype.selectOrAppend = function (parent, selector, element) {
+    var selection = parent.select(selector);
+    if(selection.empty()){
+        return parent.append(element || selector);
+    }
+    return selection;
+};
 function D3ScatterPlotMatrix(placeholderSelector, data, config) {
     this.utils = new D3ScatterPlotMatrixUtils();
     this.placeholderSelector = placeholderSelector;
     this.svg = null;
     this.defaultConfig = {
         width: 0,
-        size: 200,
-        padding: 20,
+        size: 200, //cell size
+        padding: 20, //cell padding
         brush: true,
         guides: true,
         tooltip: true,
@@ -98,10 +106,12 @@ function D3ScatterPlotMatrix(placeholderSelector, data, config) {
             bottom: 30
         },
         x: {// X axis config
-            orient: "bottom"
+            orient: "bottom",
+            scale: "linear"
         },
         y: {// Y axis config
-            orient: "left"
+            orient: "left",
+            scale: "linear"
         },
         dot: {
             radius: 2,
@@ -250,7 +260,7 @@ D3ScatterPlotMatrix.prototype.setupX = function () {
     var conf = this.config;
 
     x.value = conf.traits.value;
-    x.scale = d3.scale.linear().range([conf.padding / 2, plot.size - conf.padding / 2]);
+    x.scale = d3.scale[conf.x.scale]().range([conf.padding / 2, plot.size - conf.padding / 2]);
     x.map = function (d, trait) {
         return x.scale(x.value(d, trait));
     };
@@ -266,7 +276,7 @@ D3ScatterPlotMatrix.prototype.setupY = function () {
     var conf = this.config;
 
     y.value = conf.traits.value;
-    y.scale = d3.scale.linear().range([ plot.size - conf.padding / 2, conf.padding / 2]);
+    y.scale = d3.scale[conf.y.scale]().range([ plot.size - conf.padding / 2, conf.padding / 2]);
     y.map = function (d, trait) {
         return y.scale(y.value(d, trait));
     };
@@ -295,7 +305,7 @@ D3ScatterPlotMatrix.prototype.drawPlot = function () {
 
 
     if(conf.tooltip){
-        self.plot.tooltip = d3.select(self.placeholderSelector).append("div")
+        self.plot.tooltip = this.utils.selectOrAppend(d3.select(self.placeholderSelector), 'div.mw-tooltip', 'div')
             .attr("class", "mw-tooltip")
             .style("opacity", 0);
     }
@@ -397,8 +407,16 @@ D3ScatterPlotMatrix.prototype.initSvg = function () {
     var height =  self.plot.height+ config.margin.top + config.margin.bottom;
     var aspect = width / height;
 
+    
+    
+    self.svg = d3.select(self.placeholderSelector).select("svg");
+    if(!self.svg.empty()){
+        self.svg.remove();
 
-    self.svg = d3.select(self.placeholderSelector).append("svg")
+    }
+    self.svg = d3.select(self.placeholderSelector).append("svg");
+
+    self.svg
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", "0 0 "+" "+width+" "+height)
@@ -406,6 +424,7 @@ D3ScatterPlotMatrix.prototype.initSvg = function () {
         .attr("class", "mw-d3-scatterplot-matrix");
 
     self.svgG = self.svg.append("g")
+        .attr("class", "mw-container")
         .attr("transform", "translate(" + config.margin.left + "," + config.margin.top + ")");
 
 
@@ -429,9 +448,9 @@ D3ScatterPlotMatrix.prototype.drawBrush = function (cell) {
     var brush = d3.svg.brush()
         .x(self.plot.x.scale)
         .y(self.plot.y.scale)
-        .on("brushstart", brushstart)
-        .on("brush", brushmove)
-        .on("brushend", brushend);
+            .on("brushstart", brushstart)
+            .on("brush", brushmove)
+            .on("brushend", brushend);
 
     cell.append("g").call(brush);
 

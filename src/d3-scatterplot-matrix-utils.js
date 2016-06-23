@@ -79,3 +79,11 @@ D3ScatterPlotMatrixUtils.prototype.isNumber = function(a) {
 D3ScatterPlotMatrixUtils.prototype.isFunction = function(a) {
     return typeof a === 'function';
 };
+
+D3ScatterPlotMatrixUtils.prototype.selectOrAppend = function (parent, selector, element) {
+    var selection = parent.select(selector);
+    if(selection.empty()){
+        return parent.append(element || selector);
+    }
+    return selection;
+};

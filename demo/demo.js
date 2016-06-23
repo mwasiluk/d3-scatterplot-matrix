@@ -10,6 +10,9 @@ var conf = {
         // includeCategoryInPlot: true,
         // keys: ['petal length', 'petal width'],
         // labels: ['a', 'b', 'c', 'd', 'e']
+    },
+    x:{
+        // scale: "identity"
     }
 
 
