@@ -1,5 +1,7 @@
 # d3-scatterplot-matrix
 
+Project moved to [charts-d3](https://github.com/mwasiluk/charts-d3)
+
 [Online Demo](https://mwasiluk.github.io/d3-scatterplot-matrix)
 
 ## Bower
